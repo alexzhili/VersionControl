@@ -1,54 +1,25 @@
 version: 2.1
 
 jobs:
-  docker-build-and-serve: # This is the name of the job, feel free to change it to better match what you're trying to do!
-    machine:
-      image: ubuntu-2204:2022.04.2
-    # docker:
-    #   - image: cimg/base:2021.04
-    resource_class: large
-    # Checkout the code as the first step. This is a dedicated CircleCI step.
-    # Then run your tests!
-    # CircleCI will report the results back to your VCS provider.
+  test-build-and-tag: 
+    docker:
+      - image: cimg/base:2022.09
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
-      # - setup_remote_docker:
-      #     version: 20.10.14
       - run:
-          name: Install Docker Compose
-          environment:
-            COMPOSE_VERSION: '1.29.2'
+          name: unitests
+          command: python tests.py
+      - run:
+          name: Build image and Push image to Docker Hub
           command: |
-            curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o ~/docker-compose
-            chmod +x ~/docker-compose
-            sudo mv ~/docker-compose /usr/local/bin/docker-compose
-      - run:
-          name: Build docker images
-          command: docker-compose build 
-            # |
-            # docker build -t spark:3.3 -f ./Docker/Spark/Dockerfile .
-            # docker build -t spark-worker:3.3 -f ./Docker/Spark-worker/Dockerfile .
-            # docker build -t python-runner -f ./Docker/Python-runner/Dockerfile .
-            # docker build -t pyspark-runner -f ./Docker/pySpark-runner/Dockerfile .
-      - run:
-          name: Services up
-          command: docker-compose up -d --no-deps spark-master spark-worker mongo api
-      - run:
-          name: ETL
-          command:  docker-compose run --rm --no-deps etl-runner python url_load.py --fileName=sample.json
-      - run:
-          name: pySpark
-          command:  docker-compose run --rm --no-deps pyspark-runner python spark_trending.py --fileName=sample
-
-          # docker-compose run --rm --no-deps etl-runner python etl.py --fileName=sample.json &&  docker-compose run --rm --no-deps pyspark-runner python spark_trending.py --fileName=sample
-
-# load files from url to HDFS
-# wget url && docker-compose exec namenode hadoop fs -put /sample.json /
-
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+            TAG=0.1.$CIRCLE_BUILD_NUM
+            docker build -t $DOCKERHUB_USERNAME/VersionControlDemo:$TAG .
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+            docker push $DOCKERHUB_USERNAME/VersionControlDemo:$TAG
 workflows:
-  Step1: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  Step: 
     jobs:
-      - docker-build-and-serve
+      - test-build-and-tag
