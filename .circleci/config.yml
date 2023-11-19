@@ -11,7 +11,7 @@ jobs:
       - checkout
       - run:
           name: unitests
-          command: python tests.py
+          command: python src/tests.py
       - run:
           name: Build image and Push image to Docker Hub
           command: |
