@@ -24,4 +24,8 @@ jobs:
 workflows:
   project-deploy-workflows: 
     jobs:
-      - test-build-and-tag
+      - test-build-and-tag:
+          filters: 
+            tags:
+              only: 
+                - /^v.*/
