@@ -17,9 +17,9 @@ jobs:
           # TAG=0.1.$CIRCLE_BUILD_NUM
           command: |
             TAG=<< pipeline.git.tag >>
-            docker build -t $DOCKERHUB_USERNAME/VersionControlDemo:$TAG .
+            docker build -t $DOCKERHUB_USERNAME/version_control_demo:$TAG .
             echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-            docker push $DOCKERHUB_USERNAME/VersionControlDemo:$TAG
+            docker push $DOCKERHUB_USERNAME/version_control_demo:$TAG
 workflows:
   project-deploy-workflows: 
     jobs:
