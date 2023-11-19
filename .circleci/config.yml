@@ -29,5 +29,5 @@ workflows:
             tags:
               only: 
                 - /^v.*/
-          branches:
-              ignore: /.*/
+            branches:
+                ignore: /.*/
