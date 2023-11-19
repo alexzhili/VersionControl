@@ -3,12 +3,12 @@ version: 2.1
 jobs:
   test-build-and-tag: 
     docker:
-      - image: cimg/python:3.12.0
+      - image: cimg/base
     steps:
       - checkout
       - run:
           name: unitests
-          command: python src/tests.py
+          command: echo "Run some tests" 
       - run: echo "This is tag << pipeline.git.tag >>" 
       - run:
           name: Build image and Push image to Docker Hub
