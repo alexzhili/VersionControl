@@ -12,6 +12,7 @@ jobs:
       - run:
           name: unitests
           command: python src/tests.py
+      - run: echo "This is tag << pipeline.git.tag >>" 
       - run:
           name: Build image and Push image to Docker Hub
           # TAG=0.1.$CIRCLE_BUILD_NUM
