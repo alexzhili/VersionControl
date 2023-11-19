@@ -14,12 +14,13 @@ jobs:
           command: python src/tests.py
       - run:
           name: Build image and Push image to Docker Hub
+          # TAG=0.1.$CIRCLE_BUILD_NUM
           command: |
-            TAG=0.1.$CIRCLE_BUILD_NUM
+            TAG=<< pipeline.git.tag >>
             docker build -t $DOCKERHUB_USERNAME/VersionControlDemo:$TAG .
             echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
             docker push $DOCKERHUB_USERNAME/VersionControlDemo:$TAG
 workflows:
-  Step: 
+  project-deploy-workflows: 
     jobs:
       - test-build-and-tag
